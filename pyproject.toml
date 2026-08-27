@@ -1,0 +1,99 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "videogen"
+version = "2.0.0"
+description = "Turn source material (PDF, text, or a web article) into a narrated, captioned short-form video."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Nabi Bukhsh Baloch" }]
+keywords = ["video", "ai", "shorts", "tts", "text-to-video", "openai", "elevenlabs"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Video",
+]
+
+# Core runtime: deliberately small. Everything that talks to a paid API is an extra,
+# so `pip install videogen` stays installable in CI and offline/dry-run runs work.
+dependencies = [
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "Pillow>=10.2",
+    "numpy>=1.26",
+    "typer>=0.12",
+    "rich>=13.7",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+openai = ["openai>=1.40"]
+anthropic = ["anthropic>=0.34"]
+elevenlabs = ["elevenlabs>=1.5"]
+pdf = ["pymupdf>=1.24"]
+web = ["beautifulsoup4>=4.12", "lxml>=5.2"]
+ui = ["streamlit>=1.36"]
+all = [
+    "openai>=1.40",
+    "anthropic>=0.34",
+    "elevenlabs>=1.5",
+    "pymupdf>=1.24",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.2",
+    "streamlit>=1.36",
+]
+dev = [
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+videogen = "videogen.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/NabiBukhsh-AI/VideoGenerator"
+Repository = "https://github.com/NabiBukhsh-AI/VideoGenerator"
+Issues = "https://github.com/NabiBukhsh-AI/VideoGenerator/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["videogen"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
+# B008: typer declares CLI defaults via function calls, which is its documented API.
+# N818: our exception names read better without a forced "Error" suffix everywhere.
+# SIM905: prose word-lists stay more readable as a split string than as literals.
+ignore = ["B008", "N818", "SIM905"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests deliberately contain smart quotes (they exercise text normalisation) and
+# zip() over sequences whose equal length is the thing under test.
+"tests/**" = ["E501", "RUF001", "B905", "RUF007", "SLF001"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+ignore_missing_imports = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "integration: tests that need ffmpeg or network access",
+    "ffmpeg: tests that require an ffmpeg binary on PATH",
+]

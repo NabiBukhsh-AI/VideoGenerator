@@ -1,0 +1,25 @@
+# Normalise line endings so the repo is consistent across Windows/macOS/Linux.
+* text=auto eol=lf
+
+# Windows-native files keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets: never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.mp4 binary
+*.mp3 binary
+*.wav binary
+*.ttf binary
+*.ttc binary
+*.otf binary
+*.pdf binary
+
+# Keep generated output and vendored assets out of language statistics.
+assets/** linguist-vendored
